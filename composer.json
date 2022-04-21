@@ -1,0 +1,20 @@
+{
+    "name": "entap/phpmwbutil",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "PHPMwbUtil\\": "src/PHPMwbUtil/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Toshimasa Matsuoka",
+            "email": "matsuoka@entap.co.jp"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+      "ext-dom": "*"
+    }
+}
