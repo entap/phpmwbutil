@@ -11,4 +11,9 @@ class MwbIndex
     public $indexType;
     public $isPrimary;
     public $unique;
+
+    public function isSingleColumn()
+    {
+        return count($this->columns) == 1;
+    }
 }

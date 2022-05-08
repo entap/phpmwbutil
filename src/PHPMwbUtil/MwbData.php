@@ -6,6 +6,12 @@ class MwbData
 {
     public $tables;
 
+    /**
+     * SQLite3データベースをバイナリデータで渡して、全データを読み込む
+     *
+     * @param string $bin
+     * @return void
+     */
     public function load(string $bin)
     {
         $db = $this->sqliteOpen($bin);
@@ -19,7 +25,7 @@ class MwbData
     }
 
     /**
-     * SQLite3データベースをバイナリデータで渡して開く
+     * SQLite3データベースをバイナリデータを開く
      *
      * @param $bin
      * @return \SQLite3

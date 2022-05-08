@@ -21,7 +21,7 @@ class MwbDocument
     /**
      * idからオブジェクトへのマップ
      */
-    private $idMap = [];
+    private $valuesById = [];
 
     public $physicalModels;
     public $data;
@@ -39,7 +39,7 @@ class MwbDocument
         // mwbファイルからXMLを読み込む
         $stream = $zipArchive->getStream('document.mwb.xml');
         if (!$stream) {
-            throw new \RuntimeException('Invalid mwb file');
+            throw new \RuntimeException('Invalid mwb file: document.mwb.xml not found');
         }
         $xml = stream_get_contents($stream);
         fclose($stream);
@@ -52,13 +52,24 @@ class MwbDocument
         // 各テーブルの初期値データを読み込む
         $stream = $zipArchive->getStream('@db/data.db');
         if (!$stream) {
-            throw new \RuntimeException('Invalid mwb file');
+            throw new \RuntimeException('Invalid mwb file: @db/data.db not found');
         }
         $this->data = new MwbData();
         $this->data->load(stream_get_contents($stream));
         fclose($stream);
 
         $zipArchive->close();
+
+        // シンプルなデータ形式かを調べる
+        if (count($this->physicalModels) != 1) {
+            throw new \RuntimeException('Unsupported mwb file: file must contains only one model');
+        }
+        if (!isset($this->physicalModels[0]->catalog)) {
+            throw new \RuntimeException('Unsupported mwb file: catalog not found');
+        }
+        if (count($this->physicalModels[0]->catalog->schemata) != 1) {
+            throw new \RuntimeException('Unsupported mwb file: file must contains only one schema');
+        }
     }
 
     /**
@@ -75,7 +86,6 @@ class MwbDocument
             throw new \RuntimeException('Invalid mwb file');
         }
         $this->mapObject($entries[0], $this);
-        //$this->resolveLinks($this);
     }
 
     /**
@@ -84,9 +94,35 @@ class MwbDocument
      * @param $id
      * @return mixed
      */
-    public function getById(string $id)
+    public function getValueById(string $id)
     {
-        return isset($this->idMap[$id]) ? $this->idMap[$id] : $id;
+        return isset($this->valuesById[$id]) ? $this->valuesById[$id] : $id;
+    }
+
+    /**
+     * テーブル一覧を取得する
+     *
+     * @return void
+     */
+    public function tables(): array
+    {
+        return $this->physicalModels[0]->catalog->schemata[0]->tables;
+    }
+
+    /**
+     * テーブルをIDを指定して取得する
+     *
+     * @param $id string ID
+     * @return MwbTable テーブル
+     */
+    public function getTableById(string $id)
+    {
+        foreach ($this->tables() as $table) {
+            if ($table->id == $id) {
+                return $table;
+            }
+        }
+        return NULL;
     }
 
     /**
@@ -122,7 +158,7 @@ class MwbDocument
                 return $node->textContent;
             }
         } else if ($node->nodeName == 'link') {
-            return new MwbLink($this, $node->textContent);
+            return $node->textContent;
         } else {
             return null;
         }
@@ -189,35 +225,11 @@ class MwbDocument
         }
         if ($node->hasAttribute('id')) {
             $id = $node->getAttribute('id');
-            $this->idMap[$id] = $obj;
+            $this->valuesById[$id] = $obj;
             if ($class->hasProperty('id')) {
                 $obj->id = $id;
             }
         }
         return $obj;
     }
-
-    /**
-     * リンクされているオブジェクトの参照を解決し、実体への参照に置き換える。
-     */
-    /*
-    private function resolveLinks($obj)
-    {
-        $class = new \ReflectionClass(get_class($obj));
-        foreach ($class->getProperties() as $prop) {
-            if ($prop->isPublic()) {
-                assert($prop instanceof \ReflectionProperty);
-                $value = $prop->getValue($obj);
-                if ($value instanceof MwbLink) {
-                    $prop->setValue($obj, $value->get());
-                } else if (is_object($value)) {
-                    $this->resolveLinks($value);
-                } else if (is_array($value)) {
-                    foreach ($value as $i => $x) {
-                        $value[$i] = $this->resolveLinks($x);
-                    }
-                }
-            }
-        }
-    }*/
 }
