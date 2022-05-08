@@ -15,10 +15,7 @@ class MwbTable
     public $defaultCharacterSetName;
     public $defaultCollationName;
 
-    /**
-     * IDを指定してカラムを取得する
-     */
-    public function getColumnById($id)
+    public function columnById($id)
     {
         foreach ($this->columns as $column) {
             if ($column->id == $id) {
@@ -28,22 +25,14 @@ class MwbTable
         return NULL;
     }
 
-    /**
-     * 指定したカラムに紐付いた、単一インデックスを取得する
-     *
-     * @param MwbColumn $mwbColumn
-     * @return array
-     */
-    public function getSingleIndices(MwbColumn $mwbColumn)
+    public function indicesByColumn(MwbColumn $mwbColumn)
     {
-        $singleIndices = [];
         foreach ($this->indices as $index) {
-            if ($index->isSingleColumn()) {
+            if ($index->isSingle()) {
                 if ($index->columns[0]->referencedColumn == $mwbColumn->id) {
-                    $singleIndices[] = $index;
+                    yield $index;
                 }
             }
         }
-        return $singleIndices;
     }
 }

@@ -184,6 +184,8 @@ class LaravelColumn
             if ($column == 'id') {
                 $this->typeOptions = []; // idメソッドのデフォルトカラム名はid
             }
+        } else if ($this->type == 'unsignedBigInteger' && substr($column, -3) == '_id') {
+            $this->type = 'foreignId';
         }
     }
 

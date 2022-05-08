@@ -23,7 +23,7 @@ class Migration
             $this->addColumn($writer, $mwbTable, $column);
         }
         foreach ($mwbTable->indices as $index) {
-            if (!$index->isSingleColumn()) {
+            if (!$index->isSingle()) {
                 $this->addIndex($writer, $mwbTable, $index);
             }
         }
@@ -63,7 +63,7 @@ class Migration
         if ($mwbColumn->comment !== '') {
             $laravelColumn->comment($mwbColumn->comment);
         }
-        foreach ($mwbTable->getSingleIndices($mwbColumn) as $index) {
+        foreach ($mwbTable->indicesByColumn($mwbColumn) as $index) {
             $laravelColumn->index($index->indexType, $index->name);
         }
         $laravelColumn->write($writer);
@@ -81,7 +81,7 @@ class Migration
         $laravelIndex = new LaravelIndex();
         $laravelIndex->setIndexType($mwbIndex->indexType);
         foreach ($mwbIndex->columns as $indexColumn) {
-            $column = $mwbTable->getColumnById($indexColumn->referencedColumn);
+            $column = $mwbTable->columnById($indexColumn->referencedColumn);
             if ($column) {
                 $laravelIndex->addColumn($column->name);
             }
@@ -98,17 +98,17 @@ class Migration
      */
     public function setupType(LaravelColumn $laravelColumn, MwbColumn $mwbColumn)
     {
-        $mysqlType = $mwbColumn->getMysqlType();
+        $mysqlType = $mwbColumn->mysqlType();
         if (LaravelColumn::isIntegerType($mysqlType)) {
-            $laravelColumn->integer($mysqlType, $mwbColumn->name, $mwbColumn->autoIncrement, $mwbColumn->isUnsigned());
+            $laravelColumn->integer($mysqlType, $mwbColumn->name, $mwbColumn->autoIncrement, $mwbColumn->unsigned());
         } else if (LaravelColumn::isDecimalType($mysqlType)) {
-            $laravelColumn->decimal($mysqlType, $mwbColumn->name, $mwbColumn->precision, $mwbColumn->scale, $mwbColumn->isUnsigned());
+            $laravelColumn->decimal($mysqlType, $mwbColumn->name, $mwbColumn->precision, $mwbColumn->scale, $mwbColumn->unsigned());
         } else if (LaravelColumn::isStringType($mysqlType)) {
             $laravelColumn->string($mysqlType, $mwbColumn->name, $mwbColumn->length);
         } else if (LaravelColumn::isTimeType($mysqlType)) {
             $laravelColumn->time($mysqlType, $mwbColumn->name, $mwbColumn->length);
         } else if (LaravelColumn::isEnumType($mysqlType)) {
-            $laravelColumn->enum($mysqlType, $mwbColumn->name, $mwbColumn->getEnums());
+            $laravelColumn->enum($mysqlType, $mwbColumn->name, $mwbColumn->enums());
         } else if (LaravelColumn::isSupportedType($mysqlType)) {
             $laravelColumn->type($mysqlType, $mwbColumn->name);
         }

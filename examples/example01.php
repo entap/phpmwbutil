@@ -2,8 +2,9 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$document = new PHPMwbUtil\MwbDocument();
-$document->loadFile('example01.mwb');
+$loader = new \PHPMwbUtil\MwbLoader();
+$loader->load('example01.mwb');
+$document = $loader->document;
 
 $migration = new \PHPMwbUtil\LaravelMigration\Migration();
 $writer = new \PHPMwbUtil\LaravelMigration\PhpWriter();

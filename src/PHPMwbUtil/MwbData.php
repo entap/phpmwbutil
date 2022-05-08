@@ -6,12 +6,6 @@ class MwbData
 {
     public $tables;
 
-    /**
-     * SQLite3データベースをバイナリデータで渡して、全データを読み込む
-     *
-     * @param string $bin
-     * @return void
-     */
     public function load(string $bin)
     {
         $db = $this->sqliteOpen($bin);
@@ -24,12 +18,6 @@ class MwbData
         }
     }
 
-    /**
-     * SQLite3データベースをバイナリデータを開く
-     *
-     * @param $bin
-     * @return \SQLite3
-     */
     private function sqliteOpen(string $bin)
     {
         $fp = tmpfile();
@@ -38,12 +26,6 @@ class MwbData
         return new \SQLite3(stream_get_meta_data($fp)['uri']);
     }
 
-    /**
-     * SQLite3データベースのテーブル名を取得する
-     *
-     * @param string $db
-     * @return void
-     */
     private function sqliteTables(\SQLite3 $db): array
     {
         $tables = [];

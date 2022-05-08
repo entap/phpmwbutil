@@ -30,9 +30,9 @@ class LaravelIndex
     /**
      * インデクスの名前を設定する
      */
-    public function setIndexName(string $indexName)
+    public function setName(string $name)
     {
-        $this->name = $indexName;
+        $this->name = $name;
     }
 
     /**

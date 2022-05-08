@@ -23,18 +23,18 @@ class MwbColumn
     public $precision;
     public $scale;
 
-    public function getMysqlType()
+    public function mysqlType()
     {
         $tokens = explode('.', $this->simpleType);
         return array_pop($tokens);
     }
 
-    public function isUnsigned()
+    public function unsigned()
     {
         return in_array('UNSIGNED', $this->flags);
     }
 
-    public function getEnums()
+    public function enums()
     {
         if (preg_match_all('/\'([^\']*)\'/', $this->datatypeExplicitParams, $matches)) {
             return $matches[1];
