@@ -96,7 +96,7 @@ class MwbLoader
         $obj = [];
         foreach ($node->childNodes as $childNode) {
             if ($childNode instanceof \DOMElement) {
-                if ($childNode->nodeName == 'value') {
+                if ($childNode->nodeName == 'value' || $childNode->nodeName == 'link') {
                     if (($childObj = MwbLoader::deserializeNode($childNode)) !== null) {
                         $obj[] = $childObj;
                     }
