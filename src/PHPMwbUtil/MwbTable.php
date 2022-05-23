@@ -15,7 +15,7 @@ class MwbTable
     public $defaultCharacterSetName;
     public $defaultCollationName;
 
-    public function columnById($id)
+    public function columnById(string $id)
     {
         foreach ($this->columns as $column) {
             if ($column->id == $id) {
@@ -28,7 +28,7 @@ class MwbTable
     public function indicesByColumn(MwbColumn $mwbColumn)
     {
         foreach ($this->indices as $index) {
-            if ($index->isSingle()) {
+            if ($index->single()) {
                 if ($index->columns[0]->referencedColumn == $mwbColumn->id) {
                     yield $index;
                 }

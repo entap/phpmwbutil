@@ -12,7 +12,7 @@ class MwbIndex
     public $isPrimary;
     public $unique;
 
-    public function isSingle()
+    public function single()
     {
         return count($this->columns) == 1;
     }

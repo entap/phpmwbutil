@@ -34,6 +34,11 @@ class MwbColumn
         return in_array('UNSIGNED', $this->flags);
     }
 
+    public function default()
+    {
+        return $this->defaultValueIsNull ? NULL : json_decode($this->defaultValue);
+    }
+
     public function enums()
     {
         if (preg_match_all('/\'([^\']*)\'/', $this->datatypeExplicitParams, $matches)) {

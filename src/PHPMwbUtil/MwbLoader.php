@@ -73,14 +73,14 @@ class MwbLoader
         return $node->getAttribute($attributeName);
     }
 
-    static private function deserializeNode(\DOMElement $node)
+    private function deserializeNode(\DOMElement $node)
     {
         if ($node->nodeName == 'value') {
             $type = MwbLoader::nodeAttr($node, 'type');
             if ($type == 'list') {
-                return MwbLoader::deserializeList($node);
+                return $this->deserializeList($node);
             } else if ($type == 'object') {
-                return MwbLoader::deserializeObject($node);
+                return $this->deserializeObject($node);
             } else {
                 return $node->textContent;
             }
@@ -91,13 +91,13 @@ class MwbLoader
         }
     }
 
-    static private function deserializeList(\DOMElement $node)
+    private function deserializeList(\DOMElement $node)
     {
         $obj = [];
         foreach ($node->childNodes as $childNode) {
             if ($childNode instanceof \DOMElement) {
                 if ($childNode->nodeName == 'value' || $childNode->nodeName == 'link') {
-                    if (($childObj = MwbLoader::deserializeNode($childNode)) !== null) {
+                    if (($childObj = $this->deserializeNode($childNode)) !== null) {
                         $obj[] = $childObj;
                     }
                 }
@@ -106,26 +106,26 @@ class MwbLoader
         return $obj;
     }
 
-    static private function deserializeObject(\DOMElement $node)
+    private function deserializeObject(\DOMElement $node)
     {
         $structName = MwbLoader::nodeAttr($node, 'struct-name');
         if (isset(MwbLoader::$classMap[$structName])) {
             $obj = new MwbLoader::$classMap[$structName];
-            MwbLoader::mapObject($node, $obj);
+            $this->mapObject($node, $obj);
             return $obj;
         } else {
             return new \stdClass();
         }
     }
 
-    static private function mapObject(\DOMElement $node, object $obj)
+    private function mapObject(\DOMElement $node, object $obj)
     {
         $class = new \ReflectionClass(get_class($obj));
         foreach ($node->childNodes as $childNode) {
             if ($childNode instanceof \DOMElement) {
                 $key = MwbLoader::nodeAttr($childNode, 'key');
                 if ($class->hasProperty($key)) {
-                    if (($childObj = MwbLoader::deserializeNode($childNode)) !== null) {
+                    if (($childObj = $this->deserializeNode($childNode)) !== null) {
                         $class->getProperty($key)->setValue($obj, $childObj);
                     }
                 }
@@ -135,6 +135,7 @@ class MwbLoader
             $id = $node->getAttribute('id');
             if ($class->hasProperty('id')) {
                 $obj->id = $id;
+                $this->document->objectById[$id] = $obj;
             }
         }
         return $obj;

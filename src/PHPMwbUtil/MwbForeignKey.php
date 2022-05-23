@@ -12,7 +12,7 @@ class MwbForeignKey
     public $columns;
     public $index;
 
-    public function isSingle()
+    public function single()
     {
         return count($this->columns) == 1 && count($this->referencedColumns) == 1;
     }
